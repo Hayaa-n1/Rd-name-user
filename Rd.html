@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vietnamese Random Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .card { box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+
+    <div class="bg-white p-8 rounded-2xl card w-full max-w-md text-center">
+        <h1 class="text-2xl font-bold mb-6 text-gray-800">Trình Tạo Tên & Username</h1>
+        
+        <div class="space-y-4">
+            <div id="display-name" class="p-4 bg-emerald-50 text-emerald-700 rounded-lg text-xl font-semibold min-h-[60px] flex items-center justify-center border border-emerald-100 cursor-pointer" onclick="copyText('display-name')">
+                Chưa tạo tên
+            </div>
+            
+            <div id="display-user" class="p-4 bg-rose-50 text-rose-700 rounded-lg text-xl font-semibold min-h-[60px] flex items-center justify-center border border-rose-100 cursor-pointer" onclick="copyText('display-user')">
+                Chưa tạo username
+            </div>
+
+            <hr class="my-6">
+
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="generateNewName()" class="bg-[#3EB489] hover:bg-[#349c77] text-white py-3 rounded-xl font-bold transition-all transform active:scale-95">
+                    👤 Tạo Tên
+                </button>
+                <button onclick="generateNewUser()" class="bg-[#e74a3b] hover:bg-[#d13b2d] text-white py-3 rounded-xl font-bold transition-all transform active:scale-95">
+                    🆔 Tạo User
+                </button>
+            </div>
+            
+            <p class="text-gray-400 text-sm mt-4">Click vào ô kết quả để copy</p>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-black/80 text-white px-6 py-2 rounded-full hidden"></div>
+
+    <script>
+        // Dữ liệu lấy từ file của bạn
+        const dsHo = ["Nguyễn", "Trần", "Lê", "Phạm", "Hoàng", "Huỳnh", "Phan", "Vũ", "Võ", "Đặng", "Bùi", "Đỗ", "Hồ", "Ngô", "Dương", "Lý", "An", "Vương", "Trịnh", "Lương", "Mai", "Đào", "Đoàn", "Lâm", "Phùng", "Tống", "Trương", "Hứa", "Trình", "Tạ", "Hà", "Cao"];
+        const dsDemNam = ["Văn", "Hữu", "Đức", "Minh", "Quang", "Anh", "Mạnh", "Trọng", "Thế", "Công", "Duy", "Hoàng", "Bảo", "Thành", "Quốc", "Phúc", "Tấn", "Nhật", "Đình", "Khắc", "Sĩ"];
+        const dsDemNu = ["Thị", "Thanh", "Thu", "Ngọc", "Hồng", "Diệu", "Tuyết", "Mai", "Quỳnh", "Thảo", "Bích", "Kiều", "Phương", "Kim", "Như", "Minh", "Khánh", "Trúc", "Tú", "Ánh"];
+        const dsTen = ["Anh", "Bình", "Chi", "Dũng", "Dương", "Đạt", "Giang", "Hà", "Hải", "Hạnh", "Hoa", "Hùng", "Huyền", "Hương", "Khánh", "Linh", "Long", "Mai", "Nam", "Nga", "Ngân", "Nhi", "Nhung", "Phúc", "Quân", "Quang", "Quỳnh", "Sơn", "Tâm", "Thắng", "Thành", "Thảo", "Trang", "Triết", "Tuấn", "Tùng", "Vinh", "Yến", "An", "Bảo", "Cường", "Chương", "Danh", "Diệp", "Đông", "Đức", "Gia", "Hào", "Hiếu", "Hiền", "Huy", "Khang", "Khoa", "Khôi", "Kiên", "Kiệt", "Lâm", "Lộc", "Minh", "Nghĩa", "Nhân", "Phong", "Phú", "Phương", "Phượng", "Quốc", "Quý", "Tấn", "Thạch", "Thời", "Tiến", "Toàn", "Trí", "Trung", "Tú", "Uyên", "Vượng", "Vy", "Xuân"];
+
+        let currentFullName = "";
+
+        function removeVietnameseTones(str) {
+            return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase().replace(/\s/g, '');
+        }
+
+        function generateNewName() {
+            const ho = dsHo[Math.floor(Math.random() * dsHo.length)];
+            const isNam = Math.random() > 0.5;
+            const dem = isNam ? dsDemNam[Math.floor(Math.random() * dsDemNam.length)] : dsDemNu[Math.floor(Math.random() * dsDemNu.length)];
+            const ten = dsTen[Math.floor(Math.random() * dsTen.length)];
+            currentFullName = `${ho} ${dem} ${ten}`;
+            document.getElementById('display-name').innerText = currentFullName;
+        }
+
+        function generateNewUser() {
+            const base = currentFullName ? removeVietnameseTones(currentFullName) : "user" + Math.floor(Math.random()*100);
+            const randomString = Math.random().toString(36).substring(2, 5);
+            const year = Math.floor(Math.random() * (2006 - 1992 + 1)) + 1992;
+            const shortYear = year.toString().substring(2);
+            
+            const formats = [
+                () => base + shortYear + "_" + randomString,
+                () => base + "." + randomString.toUpperCase(),
+                () => randomString + "_" + base,
+                () => base + "_" + Math.floor(Math.random() * 9999),
+                () => base + "." + shortYear + "." + Math.floor(Math.random() * 99),
+                () => base + "_" + randomString + shortYear,
+                () => base.substring(0, base.length - 2) + randomString,
+                () => base + Math.floor(Math.random() * 999)
+            ];
+            const username = formats[Math.floor(Math.random() * formats.length)]();
+            document.getElementById('display-user').innerText = username;
+        }
+
+        function copyText(id) {
+            const text = document.getElementById(id).innerText;
+            if (text.includes("Chưa tạo")) return;
+            navigator.clipboard.writeText(text);
+            
+            const toast = document.getElementById('toast');
+            toast.innerText = `Đã chép: ${text}`;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 2000);
+        }
+    </script>
+</body>
+</html>
