@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vietnamese Identity Generator Pro</title>
+    <title>Trình Tạo Tên</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -20,8 +20,7 @@
 <body class="flex items-center justify-center min-h-screen">
 
     <div class="bg-white p-8 rounded-3xl card w-full max-w-md text-center">
-        <h1 class="text-2xl font-bold mb-2 text-gray-800">Trình Tạo Identity</h1>
-        <p class="text-gray-500 text-sm mb-8">Dữ liệu thuần Việt & Hiện đại</p>
+        <h1 class="text-3xl font-extrabold mb-8 text-gray-800">Trình Tạo Tên</h1>
         
         <div class="space-y-4">
             <div id="display-name" class="result-box p-4 bg-emerald-50 text-emerald-700 rounded-2xl text-xl font-semibold min-h-[64px] flex items-center justify-center border border-emerald-100 cursor-pointer hover:bg-emerald-100" onclick="copyText('display-name')">
@@ -54,6 +53,7 @@
     <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full text-sm font-medium hidden shadow-2xl z-50"></div>
 
     <script>
+        // ... (Giữ nguyên các mảng dsHo, dsDemNam, dsDemNu, dsTen của bạn) ...
         const dsHo = ["Nguyễn", "Trần", "Lê", "Phạm", "Hoàng", "Huỳnh", "Phan", "Vũ", "Võ", "Đặng", "Bùi", "Đỗ", "Hồ", "Ngô", "Dương", "Lý", "An", "Vương", "Trịnh", "Lương", "Mai", "Đào", "Đoàn", "Lâm", "Phùng", "Tống", "Trương", "Hứa", "Trình", "Tạ", "Hà", "Cao"];
         const dsDemNam = ["Văn", "Hữu", "Đức", "Minh", "Quang", "Anh", "Mạnh", "Trọng", "Thế", "Công", "Duy", "Hoàng", "Bảo", "Thành", "Quốc", "Phúc", "Tấn", "Nhật", "Đình", "Khắc", "Sĩ"];
         const dsDemNu = ["Thị", "Thanh", "Thu", "Ngọc", "Hồng", "Diệu", "Tuyết", "Mai", "Quỳnh", "Thảo", "Bích", "Kiều", "Phương", "Kim", "Như", "Minh", "Khánh", "Trúc", "Tú", "Ánh"];
@@ -69,44 +69,36 @@
                 .replace(/\s/g, '');
         }
 
-        function generateAll() {
-            generateNewName();
-        }
+        function generateAll() { generateNewName(); }
 
         function generateNewName() {
             const ho = dsHo[Math.floor(Math.random() * dsHo.length)];
             const isNam = Math.random() > 0.5;
             const dem = isNam ? dsDemNam[Math.floor(Math.random() * dsDemNam.length)] : dsDemNu[Math.floor(Math.random() * dsDemNu.length)];
-            
             let ten;
-            do {
-                ten = dsTen[Math.floor(Math.random() * dsTen.length)];
-            } while (ten === dem);
+            do { ten = dsTen[Math.floor(Math.random() * dsTen.length)]; } while (ten === dem);
 
             currentFullName = `${ho} ${dem} ${ten}`;
             const el = document.getElementById('display-name');
             el.innerText = currentFullName;
             el.classList.remove('animate-pop');
-            void el.offsetWidth; // trigger reflow
+            void el.offsetWidth;
             el.classList.add('animate-pop');
-            
             generateNewUser();
         }
 
         function generateNewUser() {
             const namePart = currentFullName ? removeVietnameseTones(currentFullName) : "user";
-            
-            // Lấy 2 số cuối năm sinh & chuỗi ngẫu nhiên
             const yearShort = (Math.floor(Math.random() * (2006 - 1990 + 1)) + 1990).toString().substring(2);
             const rand = Math.random().toString(36).substring(2, 5); 
-            const randLong = Math.random().toString(36).substring(2, 6);
             
+            // Đã sửa để KHÔNG rút ngắn tên (bỏ slice)
             const formats = [
-                () => namePart + yearShort + rand,           // nva03mks
-                () => namePart + "." + yearShort + rand.slice(0,2), // nva.98jm
-                () => rand + "." + namePart + yearShort,     // abc.nva01
-                () => namePart + "_" + randLong,             // nva_x9k2
-                () => namePart.slice(0,4) + "." + yearShort + rand // nvap.03jkl
+                () => namePart + yearShort + rand,           // nguyenvananh03mks
+                () => namePart + "." + yearShort + rand.slice(0,2), // nguyenvananh.98jm
+                () => rand + "." + namePart + yearShort,     // mks.nguyenvananh03
+                () => namePart + "_" + rand,                 // nguyenvananh_mks
+                () => namePart + "." + rand                  // nguyenvananh.mks
             ];
             
             const username = formats[Math.floor(Math.random() * formats.length)]();
@@ -120,7 +112,6 @@
         function copyText(id) {
             const text = document.getElementById(id).innerText;
             if (text.includes("Chưa tạo")) return;
-            
             navigator.clipboard.writeText(text).then(() => {
                 const toast = document.getElementById('toast');
                 toast.innerText = `Đã sao chép: ${text}`;
